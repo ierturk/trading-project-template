@@ -1,0 +1,15 @@
+The weekly digest is not its own scheduled task: the Close Loop runs steps 2 to 4 on Mondays (close-loop.md step 4b); step 1 is the Close Loop's own live read. The skill `weekly-digest` serves the same digest on request. CHECK AND REPORT ONLY: never place, change, cancel, confirm or create any order. Times in {{TIMEZONE}}. Short, scannable: what changed or needs a decision. Only writes: Desk dataset `events` and the state files in common.md. Read common.md first.
+
+1. Accounts (read only): `get_account_summary`, `get_account_positions`; equity, cash, positions, account id; change since last Monday from `state/live_hist.json` (same account only).
+
+2. Event calendar (write): read dataset `events` (rows {"date","event","kind","note","confirmed"}). EVERY Monday check only events in the NEXT 14 DAYS against official pages (FOMC federalreserve.gov, jobs report and CPI bls.gov, NYSE holiday and closure notices; 2 to 3 fetches) and correct any date that differs. On the FIRST Monday of a month do the full sweep: confirm or correct the next 8 weeks and add missing FOMC, jobs and CPI dates. Set confirmed true for what was checked; drop rows more than 7 days old. Save `<scratchpad>/events.json`, update by the DESK method. One line "Events: N confirmed, N changed, N added, N removed" ("14-day check" or "full sweep"). If the web is unreachable keep the file and say so. If you hear of a date change between Mondays, ask for a quick events check.
+
+3. Books (only those whose STATUS in close-loop.md is ENABLED):
+ - SWE: weeks run, trades closed, open and closed P&L, review line from `swe_review_check.py` (a "REVIEW" line goes first), paper goal check (every signal logged, no rule breaks). SLIPPAGE: from SWE rows with `open_px` count fills (an entry with `open_px`, an exit with `exit_open_px`) and print "Slippage: n of 10 fills, average x%"; at 10 fills or more print once a week "SLIPPAGE REVIEW due: n fills, average x% (the backtest assumed $0.02 a share; at 0.20% its profit factor falls from about 1.5 to about 1.35)" until you say it is reviewed.
+ - SPREAD (call debit): spreads closed and open, closed P&L, open marks, distance to the -$2,000 budget line, any open spread with 7 days or fewer to expiry, goal check (every entry day looked at and logged for SPY, QQQ, GLD).
+ - PUTCS (put credit): same, line -$1,500, plus the gate: closed spreads out of 6 and days left to the gate date. The gate is a process check: no rule breaks and fills near the broker mid; it does not prove the strategy works.
+ - TREND-HOLD: positions open of 5, closed and open P&L, distance to the -$2,500 line (a "TREND-HOLD REVIEW" line goes first), status of the five at the last month end, next check date (last trading day of the month), goal check (every month-end check logged, every change entered on the first session, fills against the official open).
+
+4. MONTHLY SECTION (first digest of a month): account equity against {{PAPER_BALANCE}} plus closed P&L of the books on that account; say if it differs by more than 10%. No tuning ideas.
+
+FALLBACK: if the connector or any tool fails, report what ran and what did not; never fill numbers from memory.
