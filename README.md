@@ -63,3 +63,7 @@ You can switch any book off by setting its STATUS line to DISABLED in `prompts/c
 ## Before you share or reuse
 
 Read [PLACEHOLDERS.md](PLACEHOLDERS.md). The numbers in `strategies/` (profit factors, drawdowns) come from the original author's backtests on data up to 2026 and are examples of what to expect, not promises. Rerun them on your own data and costs.
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). Nothing here is financial advice.
